@@ -7,13 +7,12 @@
 
 static int Slisten_fd;
 static t_epoll *Sepoll;
-static	bool	Sis_running = true;
 #define			CLIENT_IS_READY_FOR_READ Sepoll->events[i].events & EPOLLIN
 #define			FD_HAS_ERROR_OR_DISCONNECT Sepoll->events[i].events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)
 #define			CLIENT_IS_READY_FOR_WRITE Sepoll->events[i].events & EPOLLOUT
 #define			NEW_CLIENT_CONNECTION client_fd == Slisten_fd
 
-static void				clean_up()
+void				clean_up_epoll()
 {
   if (Sepoll->events)
     {
@@ -98,36 +97,32 @@ char			init_epoll(int listen_fd)
   return (EXIT_FAILURE);
 }
 
-char		start_server_loop(void)
+char		poll_for_client_events(void)
 {
   int		i;
   int		client_fd;
   int		events;
 
   check(Slisten_fd && Sepoll, "You need to call init_epoll before starting the loop");
-  while(Sis_running)
+  events = epoll_wait (Sepoll->efd, Sepoll->events, MAXEVENTS, -1);
+  for(i = 0; i < events; ++i)
     {
-      events = epoll_wait (Sepoll->efd, Sepoll->events, MAXEVENTS, -1);
-      for(i = 0; i < events; ++i)
-	{
-	  client_fd = Sepoll->events[i].data.fd;
-	  debug("%i", client_fd);
-	  if (FD_HAS_ERROR_OR_DISCONNECT)
-	    delete_client(client_fd);
-	  else if (NEW_CLIENT_CONNECTION)
-	    add_new_client();
-	  else if (CLIENT_IS_READY_FOR_READ)
-	    rcv_event_callback(client_fd);/* read_request(client_fd); */
-	  else if (CLIENT_IS_READY_FOR_WRITE)
-	    send_event_callback(client_fd);
-	  else
-	    log_info("Client fd ready for something but didnt got catched by ifs Event: %i FD: %i", events, client_fd);
-	}
-      debug("tick");
+      client_fd = Sepoll->events[i].data.fd;
+      debug("%i", client_fd);
+      if (FD_HAS_ERROR_OR_DISCONNECT)
+	delete_client(client_fd);
+      else if (NEW_CLIENT_CONNECTION)
+	add_new_client();
+      else if (CLIENT_IS_READY_FOR_READ)
+	rcv_event_callback(client_fd);/* read_request(client_fd); */
+      else if (CLIENT_IS_READY_FOR_WRITE)
+	send_event_callback(client_fd);
+      else
+	log_info("Client fd ready for something but didnt got catched by ifs Event: %i FD: %i", events, client_fd);
     }
-  clean_up();
+  clean_up_epoll();
   return (EXIT_SUCCESS);
  error:
-  clean_up();
-  return (EXIT_FAILURE);  
+  clean_up_epoll();
+  return (EXIT_FAILURE);
 }

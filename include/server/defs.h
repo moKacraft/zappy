@@ -34,8 +34,9 @@ typedef struct		s_epoll
 
 /* void		start_socket(void); */
 int		start_listen(int p);
-char		start_server_loop(void);
+char		 poll_for_client_events(void);
 char		init_epoll(int listen_fd);
-void				pop_client_write(int client_fd);
-void				push_client_write(int client_fd);
+void		pop_client_write(int client_fd);
+void		push_client_write(int client_fd);
+void		clean_up_epoll();
 #endif
