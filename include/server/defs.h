@@ -39,4 +39,5 @@ char		init_epoll(int listen_fd);
 void		pop_client_write(int client_fd);
 void		push_client_write(int client_fd);
 void		clean_up_epoll();
+char		is_epoll_init();
 #endif

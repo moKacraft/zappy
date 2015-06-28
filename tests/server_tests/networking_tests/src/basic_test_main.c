@@ -19,11 +19,13 @@ int		main(int argc, char **argv)
       debug("Tick");
     }
   check(close(listen_fd) != -1, "Closing server fd");
-  clean_up_epoll();
+  if (is_epoll_init())
+    clean_up_epoll();
   return (EXIT_SUCCESS);
  error:
   if (listen_fd != -1)
     close(listen_fd);
-  clean_up_epoll();
+  if (is_epoll_init())
+    clean_up_epoll();
   return (EXIT_FAILURE);
 }

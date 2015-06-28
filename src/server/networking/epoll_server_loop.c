@@ -12,6 +12,11 @@ static t_epoll *Sepoll;
 #define			CLIENT_IS_READY_FOR_WRITE Sepoll->events[i].events & EPOLLOUT
 #define			NEW_CLIENT_CONNECTION client_fd == Slisten_fd
 
+char				is_epoll_init()
+{
+  return (Sepoll ? true : false);
+}
+
 void				clean_up_epoll()
 {
   check(Slisten_fd && Sepoll, "You need to call init_epoll before starting the loop");
