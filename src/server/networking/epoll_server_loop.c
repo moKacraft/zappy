@@ -6,11 +6,26 @@
 
 static int Slisten_fd;
 static t_epoll *Sepoll;
-
+static	bool	Sis_running = true;
 #define			CLIENT_IS_READY_FOR_READ Sepoll->events[i].events & EPOLLIN
 #define			FD_HAS_ERROR_OR_DISCONNECT Sepoll->events[i].events & (EPOLLHUP | EPOLLERR | EPOLLRDHUP)
 #define			CLIENT_IS_READY_FOR_WRITE Sepoll->events[i].events & EPOLLOUT
 #define			NEW_CLIENT_CONNECTION client_fd == Slisten_fd
+
+static void				clean_up()
+{
+  if (Sepoll->events)
+    {
+      free(Sepoll->events);
+      Sepoll->events = NULL;
+    }
+  if (Sepoll)
+    {
+      free(Sepoll);
+      Sepoll = NULL;
+    }
+  return ;
+}
 
 void				push_client_write(int client_fd)
 {
@@ -67,7 +82,6 @@ char			init_epoll(int listen_fd)
   epoll->event.events = EPOLLIN;
   epoll->s = epoll_ctl (epoll->efd, EPOLL_CTL_ADD, listen_fd, &epoll->event);
   check(epoll->s != -1, "init_epoll");
-  /* Buffer where events are returned */
   epoll->events = calloc(MAXEVENTS, sizeof(epoll->event));
   check_mem(epoll->events);
   Slisten_fd = listen_fd;
@@ -90,7 +104,7 @@ char		start_server_loop(void)
   int		events;
 
   check(Slisten_fd && Sepoll, "You need to call init_epoll before starting the loop");
-  while(true)
+  while(Sis_running)
     {
       events = epoll_wait (Sepoll->efd, Sepoll->events, MAXEVENTS, -1);
       for(i = 0; i < events; ++i)
@@ -110,13 +124,9 @@ char		start_server_loop(void)
 	}
       debug("tick");
     }
+  clean_up();
   return (EXIT_SUCCESS);
  error:
+  clean_up();
   return (EXIT_FAILURE);  
 }
-
-/* else if (Sepoll->events[i].data.fd == Slisten_fd) */
-/* 	    { */
-/* 	      add_new_client(); */
-/* 	    } */
-	  
