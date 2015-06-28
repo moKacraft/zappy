@@ -5,6 +5,7 @@
 
 int		main(int argc, char **argv)
 {
+  int		err;
   int		port;
   int		listen_fd = -1;
   char		is_running = 1;
@@ -15,7 +16,8 @@ int		main(int argc, char **argv)
   init_epoll(listen_fd);
   while(is_running)
     {
-      poll_for_client_events();
+      err = poll_for_client_events();
+      check(err != 1, "main_loop %i", err);
       debug("Tick");
     }
   check(close(listen_fd) != -1, "Closing server fd");
