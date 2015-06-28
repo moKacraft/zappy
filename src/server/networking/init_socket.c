@@ -1,5 +1,5 @@
-#include			"../include/defs.h"
-#include			"../include/dbg.h"
+#include			<server/defs.h>
+#include			<dbg.h>
 #define				SOCKET_ERROR -1
 
 static char			init_socket(t_listen *v)

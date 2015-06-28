@@ -1,4 +1,4 @@
-#include		<defs.h>
+#include		<server/defs.h>
 #include		<dbg.h>
 #define		SLEEP_TIME 1000
 

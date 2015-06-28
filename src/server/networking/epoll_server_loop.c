@@ -1,7 +1,8 @@
 #include		<stdbool.h>
 #include		<dbg.h>
-#include		<defs.h>
-#include		<callbacks.h>
+#include		<server/defs.h>
+#include		<server/callbacks.h>
+
 #define			MAXEVENTS 64
 
 static int Slisten_fd;

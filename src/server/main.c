@@ -1,6 +1,6 @@
 /* #define				NDEBUG */
-#include		"../include/dbg.h"
-#include		"../include/defs.h"
+#include		<dbg.h>
+#include		<server/defs.h>
 
 
 int		main(int argc, char **argv)
