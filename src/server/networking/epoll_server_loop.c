@@ -14,6 +14,7 @@ static t_epoll *Sepoll;
 
 void				clean_up_epoll()
 {
+  check(Slisten_fd && Sepoll, "You need to call init_epoll before starting the loop");
   if (Sepoll->events)
     {
       free(Sepoll->events);
@@ -25,6 +26,8 @@ void				clean_up_epoll()
       Sepoll = NULL;
     }
   return ;
+ error:
+  log_err("trying to free uninitialized epoll");
 }
 
 void				push_client_write(int client_fd)
