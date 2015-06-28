@@ -128,9 +128,7 @@ char		poll_for_client_events(void)
       else
 	log_info("Client fd ready for something but didnt got catched by ifs Event: %i FD: %i", events, client_fd);
     }
-  clean_up_epoll();
   return (EXIT_SUCCESS);
  error:
-  clean_up_epoll();
   return (EXIT_FAILURE);
 }
